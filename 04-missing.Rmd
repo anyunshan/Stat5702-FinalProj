@@ -1,0 +1,56 @@
+# Missing values
+
+```{r setup, include=FALSE}
+remotes::install_github("jtr13/extracat")
+```
+
+```{r, include=FALSE}
+library(tidyverse)
+data <- read.csv(file = "Mixed_data.csv") %>% na_if("N/A")
+md <- data %>% 
+  gather(key,value, -State) %>% mutate(missing = ifelse(is.na(value),"yes","no"))
+```
+
+```{r}
+colSums(is.na(data))
+```
+
+
+
+
+It seems that there are not many missing values in the data file. There are only two NAs in education level, one in offenses cases, one in political party and one in population, which means that two states do not have data for their educational levels and one state has no value for its population/political party/number of hate crimes (offenses).
+
+
+
+
+```{r,fig.width=11,fig.height=8}
+ggplot(md, aes(x=key ,y = fct_rev(State), fill = missing)) +
+  geom_tile(color = "white") + scale_fill_viridis_d() +
+  ggtitle("Missing data in the dataset")+
+  ylab("State")+ xlab("")+theme_bw()
+```
+
+
+
+
+
+This graph shows us clearly where NAs are in the data. Since the source data of educational levels only talks about 50 states in the U.S., District of Columbia as a federal district and Puerto Rico as a major territory do not have values for their educational levels. Puerto Rico's values for offenses, political party and population are missing. This is also because that Puerto Rico is a major territory of the U.S. and the source data of hate crimes does not include data for that.
+
+
+
+
+
+```{r,include=FALSE}
+library(extracat)
+visna(data)
+```
+
+
+```{r,fig.width=10,fig.height=6, warning=FALSE}
+visna(data, sort = "b")
+```
+
+
+
+
+The graph shows that there are three missing patterns in the data. The most frequent one is that no data is missing. The remaining two patterns have the same frequency. They claim that some rows have no values only in the educational level column and some have no values for educational levels, population, political party, and offenses.
